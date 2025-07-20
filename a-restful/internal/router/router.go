@@ -20,10 +20,10 @@ func Setup() *fiber.App {
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
 
+	v1.Get("/robots", handler.GetRobots)
 	v1.Post("/commands", handler.SubmitCommands)
 	v1.Get("/status/:taskID", handler.GetStatus)
 	v1.Delete("/commands/:taskID", handler.CancelTask)
-	v1.Get("/robots", handler.GetRobots)
 
 	return app
 }

@@ -12,11 +12,27 @@ func NewHandler(service *Service) *Handler {
 	}
 }
 
+// @Summary      List all robots
+// @Description  Returns a list of all registered robots and their current state
+// @Tags         Robots
+// @Produce      json
+// @Success      200 {array} RobotState
+// @Router       /api/v1/robots [get]
 func (h *Handler) GetRobots(c *fiber.Ctx) error {
 	robots := h.service.GetAllRobots()
 	return c.JSON(robots)
 }
 
+// @Summary Submit a command sequence to the robot
+// @Description Accepts a sequence of commands like "N E S W" and enqueues it for execution
+// @Tags Commands
+// @Accept json
+// @Produce json
+// @Param request body SubmitCommandsRequest true "Robot command input"
+// @Success 202 {object} SubmitCommandsResponse
+// @Failure 400 {object} ErrorResponse "Invalid input"
+// @Failure 422 {object} ErrorResponse "Validation or robot boundary error"
+// @Router /api/v1/commands [post]
 func (h *Handler) SubmitCommands(c *fiber.Ctx) error {
 	var req SubmitCommandsRequest
 
@@ -34,6 +50,14 @@ func (h *Handler) SubmitCommands(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary      Get robot task status
+// @Description  Returns the current robot position for the given task ID
+// @Tags         Status
+// @Produce      json
+// @Param        taskID path string true "Task ID"
+// @Success      200 {object} RobotState
+// @Failure      404 {object} ErrorResponse
+// @Router       /api/v1/status/{taskID} [get]
 func (h *Handler) GetStatus(c *fiber.Ctx) error {
 	taskID := c.Params("taskID")
 
@@ -45,6 +69,14 @@ func (h *Handler) GetStatus(c *fiber.Ctx) error {
 	return c.JSON(state)
 }
 
+// @Summary      Cancel robot task
+// @Description  Cancels an active robot task by task ID
+// @Tags         Commands
+// @Produce      json
+// @Param        taskID path string true "Task ID"
+// @Success      200 {object} CancelTaskResponse
+// @Failure      404 {object} ErrorResponse
+// @Router       /api/v1/commands/{taskID} [delete]
 func (h *Handler) CancelTask(c *fiber.Ctx) error {
 	taskID := c.Params("taskID")
 

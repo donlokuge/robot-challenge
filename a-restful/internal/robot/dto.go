@@ -11,3 +11,7 @@ type SubmitCommandsResponse struct {
 type CancelTaskResponse struct {
 	Message string `json:"message"`
 }
+
+type ErrorResponse struct {
+	Message string `json:"message"`
+}

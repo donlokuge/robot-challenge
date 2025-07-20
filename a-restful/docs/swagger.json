@@ -1,0 +1,200 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "REST API to control warehouse robots",
+        "title": "Robot Warehouse API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:3000",
+    "basePath": "/api/v1",
+    "paths": {
+        "/api/v1/commands": {
+            "post": {
+                "description": "Accepts a sequence of commands like \"N E S W\" and enqueues it for execution",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Commands"
+                ],
+                "summary": "Submit a command sequence to the robot",
+                "parameters": [
+                    {
+                        "description": "Robot command input",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/robot.SubmitCommandsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "$ref": "#/definitions/robot.SubmitCommandsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/robot.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Validation or robot boundary error",
+                        "schema": {
+                            "$ref": "#/definitions/robot.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/commands/{taskID}": {
+            "delete": {
+                "description": "Cancels an active robot task by task ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Commands"
+                ],
+                "summary": "Cancel robot task",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Task ID",
+                        "name": "taskID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/robot.CancelTaskResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/robot.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/robots": {
+            "get": {
+                "description": "Returns a list of all registered robots and their current state",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Robots"
+                ],
+                "summary": "List all robots",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/robot.RobotState"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/status/{taskID}": {
+            "get": {
+                "description": "Returns the current robot position for the given task ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Status"
+                ],
+                "summary": "Get robot task status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Task ID",
+                        "name": "taskID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/robot.RobotState"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/robot.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "robot.CancelTaskResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "robot.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "robot.RobotState": {
+            "type": "object",
+            "properties": {
+                "hasCrate": {
+                    "type": "boolean"
+                },
+                "x": {
+                    "type": "integer"
+                },
+                "y": {
+                    "type": "integer"
+                }
+            }
+        },
+        "robot.SubmitCommandsRequest": {
+            "type": "object",
+            "properties": {
+                "commands": {
+                    "type": "string"
+                }
+            }
+        },
+        "robot.SubmitCommandsResponse": {
+            "type": "object",
+            "properties": {
+                "taskID": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

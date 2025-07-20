@@ -1,3 +1,8 @@
+// @title           Robot Warehouse API
+// @version         1.0
+// @description     REST API to control warehouse robots
+// @host            localhost:3000
+// @BasePath        /api/v1
 package main
 
 import (

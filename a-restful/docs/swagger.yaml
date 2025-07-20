@@ -1,0 +1,131 @@
+basePath: /api/v1
+definitions:
+  robot.CancelTaskResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  robot.ErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  robot.RobotState:
+    properties:
+      hasCrate:
+        type: boolean
+      x:
+        type: integer
+      "y":
+        type: integer
+    type: object
+  robot.SubmitCommandsRequest:
+    properties:
+      commands:
+        type: string
+    type: object
+  robot.SubmitCommandsResponse:
+    properties:
+      taskID:
+        type: string
+    type: object
+host: localhost:3000
+info:
+  contact: {}
+  description: REST API to control warehouse robots
+  title: Robot Warehouse API
+  version: "1.0"
+paths:
+  /api/v1/commands:
+    post:
+      consumes:
+      - application/json
+      description: Accepts a sequence of commands like "N E S W" and enqueues it for
+        execution
+      parameters:
+      - description: Robot command input
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/robot.SubmitCommandsRequest'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/robot.SubmitCommandsResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/robot.ErrorResponse'
+        "422":
+          description: Validation or robot boundary error
+          schema:
+            $ref: '#/definitions/robot.ErrorResponse'
+      summary: Submit a command sequence to the robot
+      tags:
+      - Commands
+  /api/v1/commands/{taskID}:
+    delete:
+      description: Cancels an active robot task by task ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/robot.CancelTaskResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/robot.ErrorResponse'
+      summary: Cancel robot task
+      tags:
+      - Commands
+  /api/v1/robots:
+    get:
+      description: Returns a list of all registered robots and their current state
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/robot.RobotState'
+            type: array
+      summary: List all robots
+      tags:
+      - Robots
+  /api/v1/status/{taskID}:
+    get:
+      description: Returns the current robot position for the given task ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/robot.RobotState'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/robot.ErrorResponse'
+      summary: Get robot task status
+      tags:
+      - Status
+swagger: "2.0"

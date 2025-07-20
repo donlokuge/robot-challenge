@@ -18,9 +18,7 @@ func (h *Handler) GetRobots(c *fiber.Ctx) error {
 }
 
 func (h *Handler) SubmitCommands(c *fiber.Ctx) error {
-	var req struct {
-		Commands string `json:"commands"`
-	}
+	var req SubmitCommandsRequest
 
 	if err := c.BodyParser(&req); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "Invalid request")
@@ -31,8 +29,8 @@ func (h *Handler) SubmitCommands(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusUnprocessableEntity, err.Error())
 	}
 
-	return c.Status(fiber.StatusAccepted).JSON(fiber.Map{
-		"taskID": taskID,
+	return c.Status(fiber.StatusAccepted).JSON(SubmitCommandsResponse{
+		TaskID: taskID,
 	})
 }
 
@@ -54,7 +52,7 @@ func (h *Handler) CancelTask(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusNotFound, err.Error())
 	}
 
-	return c.JSON(fiber.Map{
-		"message": "Task cancelled",
+	return c.JSON(CancelTaskResponse{
+		Message: "Task cancelled",
 	})
 }
